@@ -1,0 +1,42 @@
+services:
+  fridger:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/postgres/init.d:/docker-entrypoint-initdb.d
+      - ./docker/postgres/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: numpy #任意のユーザ名
+      POSTGRES_PASSWORD: numpy #任意のパスワード
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      POSTGRES_DB: ingredientDB #データベース名
+    hostname: postgres
+    restart: always
+    user: root
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 81:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: fastapi@example.com #pgadminのメールアドレス
+      PGADMIN_DEFAULT_PASSWORD: password #pgadminのパスワード
+    volumes:
+      - ./docker/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+ 
